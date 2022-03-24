@@ -144,22 +144,27 @@ def FE13BaseGrowthRates():
     baseGrowth = []
 
     initialCharacters = tables[3].find_all('tr')
+    childrenCharacters = tables[4].find_all('tr')
+    dlcCharacter = tables[6].find_all('tr')
+
     for characters in initialCharacters:
         try:
             columns = characters.find_all('td')
-            data = {
-                'name' : columns[0].text,
-                'hp' : columns[1].text,
-                'str' : columns[2].text,
-                'mag' : columns[3].text,
-                'skl' : columns[4].text,
-                'spd' : columns[5].text,
-                'lck' : columns[6].text,
-                'def' : columns[7].text,
-                'res' : columns[8].text
-            }
-            helper.NameCleaner(data)
-            baseGrowth.append(data)
+            baseGrowth.append( helper.baseGrowthData(columns))
+        except IndexError:
+            pass
+
+    for characters in childrenCharacters:
+        try:
+            columns = characters.find_all('td')
+            baseGrowth.append( helper.baseGrowthData(columns))
+        except IndexError:
+            pass
+
+    for characters in dlcCharacter:
+        try:
+            columns = characters.find_all('td')
+            baseGrowth.append( helper.baseGrowthData(columns))
         except IndexError:
             pass
 

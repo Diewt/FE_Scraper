@@ -35,5 +35,20 @@ def NameCleaner(data):
 
     return data
 
+def baseGrowthData(columns):
+    data = {
+        'name' : columns[0].text,
+        'hp' : columns[1].text,
+        'str' : columns[2].text,
+        'mag' : columns[3].text,
+        'skl' : columns[4].text,
+        'spd' : columns[5].text,
+        'lck' : columns[6].text,
+        'def' : columns[7].text,
+        'res' : columns[8].text
+    }
+    NameCleaner(data)
+    return data
+
 
 
