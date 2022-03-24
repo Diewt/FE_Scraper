@@ -35,7 +35,8 @@ game_url = [
 info_url = {
     'shadowDragonDSBaseStats': 'characters/base-stats/default/',
     'shadowDragonDSstatGrowth': 'characters/growth-rates/all/',
-    'awakeningSkills' : 'miscellaneous/skills/'
+    'awakeningSkills' : 'miscellaneous/skills/',
+    'awakeningBaseGrowth' : 'characters/growth-rates/base/'
 }
 
 # Function to parse through the relevant information for Shadow Dragon
@@ -63,6 +64,7 @@ def shadowDragonDS():
 
 # Create json file containing information about skills in Awakening
 def FE13Skills():
+
     # Constructing the url for the skills in awakening
     page = base_url + game_url[13] + info_url['awakeningSkills']
 
@@ -94,7 +96,7 @@ def FE13Skills():
                 'class': columns[4].text,
                 'level': columns[5].text
             }
-            data = helper.FE13Cleaner(data)
+            data = helper.FE13SkillCleaner(data)
             skillList.append(data)
         except IndexError:
             pass
@@ -122,3 +124,53 @@ def FE13Skills():
 
 
     return
+
+def FE13BaseGrowthRates():
+    # Setting up Page Url
+    page = base_url + game_url[13] + info_url['awakeningBaseGrowth']
+
+    # Establing request
+    try:
+        r = requests.get(page)
+    except:
+        print('Something went wrong with requesting information about the url')
+        return
+
+    # Setting up Beautiful Soup
+    soup = BeautifulSoup(r.content, 'html.parser')
+    tables = soup.find_all('table')
+
+    # Setting up Json List
+    baseGrowth = []
+
+    initialCharacters = tables[3].find_all('tr')
+    for characters in initialCharacters:
+        try:
+            columns = characters.find_all('td')
+            data = {
+                'name' : columns[0].text,
+                'hp' : columns[1].text,
+                'str' : columns[2].text,
+                'mag' : columns[3].text,
+                'skl' : columns[4].text,
+                'spd' : columns[5].text,
+                'lck' : columns[6].text,
+                'def' : columns[7].text,
+                'res' : columns[8].text
+            }
+            helper.NameCleaner(data)
+            baseGrowth.append(data)
+        except IndexError:
+            pass
+
+    with open('baseGrowth.json', 'w') as f:
+        f.write(json.dumps(baseGrowth, indent=4))
+
+
+    return
+
+
+
+
+
+

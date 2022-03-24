@@ -1,6 +1,6 @@
 import re
 
-def FE13Cleaner(data):
+def FE13SkillCleaner(data):
 
     if data['activation'] == "\u2013":
         data['activation'] = '-'
@@ -28,3 +28,12 @@ def FE13Cleaner(data):
         pass
 
     return data
+
+def NameCleaner(data):
+    if '\u2019' in data['name']:
+        data['name'] = data['name'].replace('\u2019', '\'')
+
+    return data
+
+
+
