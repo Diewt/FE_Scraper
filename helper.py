@@ -35,20 +35,47 @@ def NameCleaner(data):
 
     return data
 
-def baseGrowthData(columns):
+def FE13baseGrowthData(columns):
     data = {
         'name' : columns[0].text,
-        'hp' : columns[1].text,
-        'str' : columns[2].text,
-        'mag' : columns[3].text,
-        'skl' : columns[4].text,
-        'spd' : columns[5].text,
-        'lck' : columns[6].text,
-        'def' : columns[7].text,
-        'res' : columns[8].text
+        'hp' : int(columns[1].text),
+        'str' : int(columns[2].text),
+        'mag' : int(columns[3].text),
+        'skl' : int(columns[4].text),
+        'spd' : int(columns[5].text),
+        'lck' : int(columns[6].text),
+        'def' : int(columns[7].text),
+        'res' : int(columns[8].text)
     }
     NameCleaner(data)
     return data
 
+def FE13weaponData(columns):
+    try:
+        data = {
+            'name' : columns[1].text,
+            'rank' : columns[2].text,
+            'mt' : int(columns[3].text),
+            'hit' : int(columns[4].text),
+            'crit' : int(columns[5].text),
+            'rng' : columns[6].text,
+            'effect' : '',
+            'uses' : columns[8].text,
+            'worth' : columns[9].text,
+            'description' : columns[10].text
+        }
+    except ValueError:
+            data = {
+            'name' : columns[1].text,
+            'rank' : columns[2].text,
+            'mt' : int(columns[3].text),
+            'hit' : int(columns[4].text),
+            'crit' : int(columns[5].text),
+            'rng' : columns[6].text,
+            'effect' : '',
+            'uses' : columns[8].text,
+            'worth' : columns[9].text,
+            'description' : columns[10].text
+        }
 
 

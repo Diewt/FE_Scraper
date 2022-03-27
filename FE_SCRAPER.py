@@ -1,3 +1,4 @@
+from logging import info
 import requests
 import re
 import json
@@ -36,8 +37,19 @@ info_url = {
     'shadowDragonDSBaseStats': 'characters/base-stats/default/',
     'shadowDragonDSstatGrowth': 'characters/growth-rates/all/',
     'awakeningSkills' : 'miscellaneous/skills/',
-    'awakeningBaseGrowth' : 'characters/growth-rates/base/'
+    'awakeningBaseGrowth' : 'characters/growth-rates/base/',
+    'awakeningItems' : [
+        'inventory/swords/',
+        'inventory/lances/',
+        'inventory/axes/',
+        'inventory/bows/',
+        'inventory/tomes/',
+        'inventory/staves/',
+        'inventory/stones-miscellaneous/',
+        'inventory/items/'
+    ]
 }
+
 
 # Function to parse through the relevant information for Shadow Dragon
 # I don't know if the other pages are set up similarly so Shadow dragon will have its own function for parsing
@@ -89,13 +101,22 @@ def FE13Skills():
     for skill in obtainableSkills:
         try:
             columns = skill.find_all('td')
-            data = {
-                'skill': columns[1].text,
-                'effect': columns[2].text,
-                'activation': columns[3].text,
-                'class': columns[4].text,
-                'level': columns[5].text
-            }
+            try:
+                data = {
+                    'skill': columns[1].text,
+                    'effect': columns[2].text,
+                    'activation': columns[3].text,
+                    'class': columns[4].text,
+                    'level': int(columns[5].text)
+                }
+            except ValueError:
+                data = {
+                    'skill': columns[1].text,
+                    'effect': columns[2].text,
+                    'activation': columns[3].text,
+                    'class': columns[4].text,
+                    'level': columns[5].text
+                }
             data = helper.FE13SkillCleaner(data)
             skillList.append(data)
         except IndexError:
@@ -114,7 +135,7 @@ def FE13Skills():
                 'activation': columns[3].text,
                 'difficulty': columns[4].text,
             }
-            data = helper.FE13Cleaner(data)
+            data = helper.FE13SkillCleaner(data)
             skillList.append(data)
         except IndexError:
             pass
@@ -150,21 +171,21 @@ def FE13BaseGrowthRates():
     for characters in initialCharacters:
         try:
             columns = characters.find_all('td')
-            baseGrowth.append( helper.baseGrowthData(columns))
+            baseGrowth.append( helper.FE13baseGrowthData(columns))
         except IndexError:
             pass
 
     for characters in childrenCharacters:
         try:
             columns = characters.find_all('td')
-            baseGrowth.append( helper.baseGrowthData(columns))
+            baseGrowth.append( helper.FE13baseGrowthData(columns))
         except IndexError:
             pass
 
     for characters in dlcCharacter:
         try:
             columns = characters.find_all('td')
-            baseGrowth.append( helper.baseGrowthData(columns))
+            baseGrowth.append( helper.FE13baseGrowthData(columns))
         except IndexError:
             pass
 
@@ -173,6 +194,29 @@ def FE13BaseGrowthRates():
 
 
     return
+
+def FE13Items():
+    for x in range(len(info_url['awakeningItems'])):
+        page = base_url + game_url[13] + info_url['awakeningItems'][x] 
+
+        try:
+            r = requests.get(page)
+        except:
+            print('Something went wrong with requesting information about the url')
+            return          
+
+        soup = BeautifulSoup(r.content, 'html.parser')
+        items = soup.find_all('tr') 
+
+        for item in items:
+            try:
+                columns = item.find_all('td')
+                print(columns[1].text)
+            except IndexError:
+                pass
+        
+
+
 
 
 
