@@ -117,7 +117,7 @@ def FE13Skills():
                     'class': columns[4].text,
                     'level': columns[5].text
                 }
-            data = helper.FE13SkillCleaner(data)
+            data = helper.FE13SkillCleaner(data, 1)
             skillList.append(data)
         except IndexError:
             pass
@@ -135,7 +135,7 @@ def FE13Skills():
                 'activation': columns[3].text,
                 'difficulty': columns[4].text,
             }
-            data = helper.FE13SkillCleaner(data)
+            data = helper.FE13SkillCleaner(data, 2)
             skillList.append(data)
         except IndexError:
             pass

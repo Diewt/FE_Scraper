@@ -1,7 +1,8 @@
 import re
 
 # Helper function to clean up unicode values found in the data
-def FE13SkillCleaner(data):
+def FE13SkillCleaner(data, skillType):
+
 
     if data['activation'] == "\u2013":
         data['activation'] = '-'
@@ -19,14 +20,40 @@ def FE13SkillCleaner(data):
     if '\u2019' in data['skill']:
         data['skill'] = data['skill'].replace('\u2019', '\'')
 
-    try:
+    if skillType == 1:
         if data['class'] == "\u2013":
             data['class'] = '-'
 
         if data['level'] == "\u2013":
             data['level'] = '-'
-    except:
-        pass
+
+    data = FE13SkillNotes(data, skillType)
+
+    return data
+
+# Helper Function to add in notes from the site scraped
+def FE13SkillNotes(data, skillType):
+    # skillType 1 is obtainable skills, skillType 2 is enemy only skills
+    if skillType == 1:
+        # Note 1
+        if '*1' in data['effect']:
+            data['effect'] = data['effect'].replace('*1', '(Strenght, Magic, Skill, Speed, Luck, Defense, Resistance)')
+        # Note 2
+        if '*2' in data['effect']:
+            data['effect'] = data['effect'].replace('*2', '(Does not apply for Dual Strikes)')
+        # Note 3
+        if '*3' in data['effect']:
+            data['effect'] = data['effect'].replace('*3', '(Horse, Pegasus, Griffon riders, and Taguel')
+        # Note 4
+        if '*4' in data['effect']:
+            data['effect'] = data['effect'].replace('*4', '(DLC only)')
+        if '*4' in data['class']:
+            data['class'] = data['class'].replace('*4', '(DLC only)')
+        
+    elif skillType == 2:
+        # Note 1
+        if '*1' in data['effect']:
+            data['effect'] = data['effect'].replace('*1', '(Does not apply for Dual Strikes)')
 
     return data
 
@@ -107,6 +134,6 @@ def FE13useItemData(columns):
             'worth' : columns[3].text,
             'description' : columns[4].text
         }
-        
+
     return data
 

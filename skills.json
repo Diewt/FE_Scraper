@@ -50,7 +50,7 @@
     },
     {
         "skill": "Rally Spectrum",
-        "effect": "All stats *1 +4 to all allies within a 3 tile radius for one Turn when the Rally command is used",
+        "effect": "All stats (Strenght, Magic, Skill, Speed, Luck, Defense, Resistance) +4 to all allies within a 3 tile radius for one Turn when the Rally command is used",
         "activation": "Command",
         "class": "Grandmaster",
         "level": 15
@@ -71,14 +71,14 @@
     },
     {
         "skill": "Defender",
-        "effect": "All stats *1 +1 when paired up",
+        "effect": "All stats (Strenght, Magic, Skill, Speed, Luck, Defense, Resistance) +1 when paired up",
         "activation": "-",
         "class": "Paladin",
         "level": 5
     },
     {
         "skill": "Aegis",
-        "effect": "Halves damage from bows, tomes and dragonstones *2",
+        "effect": "Halves damage from bows, tomes and dragonstones (Does not apply for Dual Strikes)",
         "activation": "Skill%",
         "class": "Paladin",
         "level": 15
@@ -120,7 +120,7 @@
     },
     {
         "skill": "Pavise",
-        "effect": "Halves damage from swords, lances, axes (includes magical variants) and beaststones *2",
+        "effect": "Halves damage from swords, lances, axes (includes magical variants) and beaststones (Does not apply for Dual Strikes)",
         "activation": "Skill%",
         "class": "General",
         "level": 15
@@ -204,7 +204,7 @@
     },
     {
         "skill": "Counter",
-        "effect": "Returns damage when attacked by an adjacent enemy (except damage that KOs the user) *2",
+        "effect": "Returns damage when attacked by an adjacent enemy (except damage that KOs the user) (Does not apply for Dual Strikes)",
         "activation": "-",
         "class": "Warrior",
         "level": 15
@@ -568,7 +568,7 @@
     },
     {
         "skill": "Beastbane",
-        "effect": "Deals effective damage to  (beast *3) units when user is a Taguel",
+        "effect": "Deals effective damage to  (beast (Horse, Pegasus, Griffon riders, and Taguel) units when user is a Taguel",
         "activation": "-",
         "class": "Taguel",
         "level": 15
@@ -596,7 +596,7 @@
     },
     {
         "skill": "Conquest",
-        "effect": "Negates user's  (beast *3) and  (armour) type weaknesses (Walhart, Morgan as Walhart's son, Zephiel and DLC Ephraim only)",
+        "effect": "Negates user's  (beast (Horse, Pegasus, Griffon riders, and Taguel) and  (armour) type weaknesses (Walhart, Morgan as Walhart's son, Zephiel and DLC Ephraim only)",
         "activation": "-",
         "class": "-",
         "level": "-"
@@ -605,61 +605,61 @@
         "skill": "Resistance +10",
         "effect": "Resistance +10",
         "activation": "-",
-        "class": "Dread Fighter *4",
+        "class": "Dread Fighter (DLC only)",
         "level": 1
     },
     {
         "skill": "Aggressor",
         "effect": "Attack +10 during the user's Turn",
         "activation": "-",
-        "class": "Dread Fighter *4",
+        "class": "Dread Fighter (DLC only)",
         "level": 15
     },
     {
         "skill": "Rally Heart",
-        "effect": "All stats *1 +2 and Movement +1 to all allies within a 3 tile radius for one Turn when the Rally command is used",
+        "effect": "All stats (Strenght, Magic, Skill, Speed, Luck, Defense, Resistance) +2 and Movement +1 to all allies within a 3 tile radius for one Turn when the Rally command is used",
         "activation": "Command",
-        "class": "Bride *4",
+        "class": "Bride (DLC only)",
         "level": 1
     },
     {
         "skill": "Bond",
         "effect": "Restores 10 HP to all allies within a 3 tile radius at the beginning of the user's Turn",
         "activation": "-",
-        "class": "Bride *4",
+        "class": "Bride (DLC only)",
         "level": 15
     },
     {
         "skill": "All Stats +2",
-        "effect": "Strength, Magic, Skill, Speed, Luck, Defence and Resistance +2 (Learned by using the All Stats +2 item *4)",
+        "effect": "Strength, Magic, Skill, Speed, Luck, Defence and Resistance +2 (Learned by using the All Stats +2 item (DLC only))",
         "activation": "-",
         "class": "-",
         "level": "-"
     },
     {
         "skill": "Paragon",
-        "effect": "Experience gain x2(Learned by using the Paragon item *4)",
+        "effect": "Experience gain x2(Learned by using the Paragon item (DLC only))",
         "activation": "-",
         "class": "-",
         "level": "-"
     },
     {
         "skill": "Iote's Shield",
-        "effect": "Negates user's (flying) type weakness(Learned by using the Iote's Shield item *4)",
+        "effect": "Negates user's (flying) type weakness(Learned by using the Iote's Shield item (DLC only))",
         "activation": "-",
         "class": "-",
         "level": "-"
     },
     {
         "skill": "Limit Breaker",
-        "effect": "Raises the character's maximum stats *1 by 10(Learned by using the Limit Breaker item *4)",
+        "effect": "Raises the character's maximum stats (Strenght, Magic, Skill, Speed, Luck, Defense, Resistance) by 10(Learned by using the Limit Breaker item (DLC only))",
         "activation": "-",
         "class": "-",
         "level": "-"
     },
     {
         "skill": "Outrealm Skill",
-        "effect": "What a DLC Skill looks like without DLC installed *4",
+        "effect": "What a DLC Skill looks like without DLC installed (DLC only)",
         "activation": "-",
         "class": "-",
         "level": "-"
