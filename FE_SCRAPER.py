@@ -146,6 +146,7 @@ def FE13Skills():
 
     return
 
+# Create json file containing info about character base growth rates in FE13
 def FE13BaseGrowthRates():
     # Setting up Page Url
     page = base_url + game_url[13] + info_url['awakeningBaseGrowth']
@@ -164,13 +165,18 @@ def FE13BaseGrowthRates():
     # Setting up Json List
     baseGrowth = []
 
+    # Grabbing the nessecary tables on the site
     initialCharacters = tables[3].find_all('tr')
     childrenCharacters = tables[4].find_all('tr')
     dlcCharacter = tables[6].find_all('tr')
 
+    # Next 3 for loops goes through each row in the table and follow same logic
     for characters in initialCharacters:
         try:
+            # Grabing information from each column in the row extracted
             columns = characters.find_all('td')
+
+            # Appending information onto final list that will be convered to json
             baseGrowth.append( helper.FE13baseGrowthData(columns))
         except IndexError:
             pass
@@ -189,31 +195,47 @@ def FE13BaseGrowthRates():
         except IndexError:
             pass
 
+    # Write information from baseGrowth into a json file
     with open('baseGrowth.json', 'w') as f:
         f.write(json.dumps(baseGrowth, indent=4))
 
 
     return
 
+# Create json file containing info about items in FE13
 def FE13Items():
+    
+    # Loop to iterate through all the subpages for the awakening items
     for x in range(len(info_url['awakeningItems'])):
+        
+        # Setting up the page url
         page = base_url + game_url[13] + info_url['awakeningItems'][x] 
 
+        # Attempt to request page
         try:
             r = requests.get(page)
         except:
             print('Something went wrong with requesting information about the url')
             return          
 
+        # Set up beautiful soup to scrape the site
         soup = BeautifulSoup(r.content, 'html.parser')
         items = soup.find_all('tr') 
 
-        for item in items:
-            try:
-                columns = item.find_all('td')
-                print(columns[1].text)
-            except IndexError:
-                pass
+        # If statement to account for use items having different format from weapons
+        if x == 7:
+            for item in items:
+                try:
+                    columns = item.find_all('td')
+                except IndexError:
+                    pass
+        else:
+            for item in items:
+                try:
+                    columns = item.find_all('td')
+                    print(columns[1].text)
+                except IndexError:
+                    pass
         
 
 

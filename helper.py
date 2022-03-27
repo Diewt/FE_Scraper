@@ -1,5 +1,6 @@
 import re
 
+# Helper function to clean up unicode values found in the data
 def FE13SkillCleaner(data):
 
     if data['activation'] == "\u2013":
@@ -29,12 +30,14 @@ def FE13SkillCleaner(data):
 
     return data
 
+# Helper function to clean up unicode values found in the data
 def NameCleaner(data):
     if '\u2019' in data['name']:
         data['name'] = data['name'].replace('\u2019', '\'')
 
     return data
 
+# Function to set up the data into a dictionary that will be sent back
 def FE13baseGrowthData(columns):
     data = {
         'name' : columns[0].text,
@@ -47,10 +50,16 @@ def FE13baseGrowthData(columns):
         'def' : int(columns[7].text),
         'res' : int(columns[8].text)
     }
+
+    # Clean up any unicode data
     NameCleaner(data)
+
+    # Return dictionary data back to call
     return data
 
+# Function to set up a dictionary for weapons that will be sent back
 def FE13weaponData(columns):
+    # Using Try Statement to account for any mismatching values ie. (encountering - for value normally has number value)
     try:
         data = {
             'name' : columns[1].text,
@@ -78,4 +87,26 @@ def FE13weaponData(columns):
             'description' : columns[10].text
         }
 
+    return data
+
+# Function to set up a dictionary for use items that will be sent back
+def FE13useItemData(columns):
+    
+    # Using Try Statement to account for any mismatching values ie. (encountering - for value normally has number value)
+    try:
+        data = {
+            'name' : columns[1].text,
+            'uses' : int(columns[2].text),
+            'worth' : int(columns[3].text),
+            'description' : columns[4].text
+        }
+    except ValueError:
+        data = {
+            'name' : columns[1].text,
+            'uses' : columns[2].text,
+            'worth' : columns[3].text,
+            'description' : columns[4].text
+        }
+        
+    return data
 
