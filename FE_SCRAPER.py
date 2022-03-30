@@ -204,7 +204,9 @@ def FE13BaseGrowthRates():
 
 # Create json file containing info about items in FE13
 def FE13Items():
-    
+
+    itemList = []
+
     # Loop to iterate through all the subpages for the awakening items
     for x in range(len(info_url['awakeningItems'])):
         
@@ -227,17 +229,29 @@ def FE13Items():
             for item in items:
                 try:
                     columns = item.find_all('td')
+                    itemList.append(helper.FE13useItemData(columns))
+                except IndexError:
+                    pass
+        elif x == 5:
+            for item in items:
+                try:
+                    columns = item.find_all('td')
+                    itemList.append(helper.FE13StavesData(columns))
                 except IndexError:
                     pass
         else:
             for item in items:
                 try:
                     columns = item.find_all('td')
-                    print(columns[1].text)
+                    itemList.append(helper.FE13weaponData(columns))
                 except IndexError:
                     pass
-        
 
+    # Write information from baseGrowth into a json file
+    with open('items.json', 'w') as f:
+        f.write(json.dumps(itemList, indent=4))
+        
+    return
 
 
 

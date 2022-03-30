@@ -3,7 +3,6 @@ import re
 # Helper function to clean up unicode values found in the data
 def FE13SkillCleaner(data, skillType):
 
-
     if data['activation'] == "\u2013":
         data['activation'] = '-'
 
@@ -64,6 +63,47 @@ def NameCleaner(data):
 
     return data
 
+# Helper function to turn the effect images into strings
+def WeaponEffectParser(data):
+
+    # if data is - then just return -
+    if data.text == '\u2013':
+        return '-'
+
+    list = []
+
+    for img in data.find_all('img', alt = True):
+        list.append(img['alt'])
+    
+    stringdata = 'effective against'
+
+    if len(list) > 1:
+        for x in range(len(list) - 1):
+            stringdata = stringdata + ' ' + str(list[x]) + ' units,'
+
+        stringdata = stringdata + ', and ' + str(list[-1]) + ' units'
+
+    else:
+        stringdata = stringdata + ' ' + str(list[-1]) + ' units'
+    
+
+    return stringdata
+
+def GeneralUnicodeCleaner(data):
+    try:
+        if '\u2019' in data:
+            data = data.replace('\u2019', '\'')
+        if "\u2013" in data:
+            data = data.replace('\u2013', '-')
+        if '\u00f6' in data:
+            data = data.replace('\u00f6', 'o')
+        if '\u00e1' in data:
+            data = data.replace('\u00e1', 'a')
+    except:
+        return data
+
+    return data
+
 # Function to set up the data into a dictionary that will be sent back
 def FE13baseGrowthData(columns):
     data = {
@@ -84,35 +124,43 @@ def FE13baseGrowthData(columns):
     # Return dictionary data back to call
     return data
 
+def FE13StavesData(columns):
+    data = {
+        'name' : columns[1].text,
+        'rank' : columns[2].text,
+        'rng' : columns[3].text,
+        'uses' : columns[4].text,
+        'worth' : columns[5].text,
+        'exp' : int(columns[6].text),
+        'description' : columns[7].text
+    }
+
+    return data
+
 # Function to set up a dictionary for weapons that will be sent back
 def FE13weaponData(columns):
     # Using Try Statement to account for any mismatching values ie. (encountering - for value normally has number value)
-    try:
-        data = {
-            'name' : columns[1].text,
-            'rank' : columns[2].text,
-            'mt' : int(columns[3].text),
-            'hit' : int(columns[4].text),
-            'crit' : int(columns[5].text),
-            'rng' : columns[6].text,
-            'effect' : '',
-            'uses' : columns[8].text,
-            'worth' : columns[9].text,
-            'description' : columns[10].text
-        }
-    except ValueError:
-            data = {
-            'name' : columns[1].text,
-            'rank' : columns[2].text,
-            'mt' : int(columns[3].text),
-            'hit' : int(columns[4].text),
-            'crit' : int(columns[5].text),
-            'rng' : columns[6].text,
-            'effect' : '',
-            'uses' : columns[8].text,
-            'worth' : columns[9].text,
-            'description' : columns[10].text
-        }
+    data = {
+        'name' : columns[1].text,
+        'rank' : columns[2].text,
+        'mt' : int(columns[3].text),
+        'hit' : int(columns[4].text),
+        'crit' : int(columns[5].text),
+        'rng' : columns[6].text,
+        'effect' : '',
+        'uses' : columns[8].text,
+        'worth' : columns[9].text,
+        'description' : columns[10].text
+    }
+
+
+    data['rank'] = GeneralUnicodeCleaner(data['rank'])
+    data['uses'] = GeneralUnicodeCleaner(data['uses'])
+    data['worth'] = GeneralUnicodeCleaner(data['worth'])
+    data['name'] = GeneralUnicodeCleaner(data['name'])
+    data['effect'] = WeaponEffectParser(columns[7])
+    data['description'] = GeneralUnicodeCleaner(data['description'])
+
 
     return data
 
@@ -120,20 +168,18 @@ def FE13weaponData(columns):
 def FE13useItemData(columns):
     
     # Using Try Statement to account for any mismatching values ie. (encountering - for value normally has number value)
-    try:
-        data = {
-            'name' : columns[1].text,
-            'uses' : int(columns[2].text),
-            'worth' : int(columns[3].text),
-            'description' : columns[4].text
-        }
-    except ValueError:
-        data = {
-            'name' : columns[1].text,
-            'uses' : columns[2].text,
-            'worth' : columns[3].text,
-            'description' : columns[4].text
-        }
+
+    data = {
+        'name' : columns[1].text,
+        'uses' : columns[2].text,
+        'worth' : columns[3].text,
+        'description' : columns[4].text
+    }
+
+    data['uses'] = GeneralUnicodeCleaner(data['uses'])
+    data['worth'] = GeneralUnicodeCleaner(data['worth'])
+    data['name'] = GeneralUnicodeCleaner(data['name'])
+    data['description'] = GeneralUnicodeCleaner(data['description'])
 
     return data
 
