@@ -135,6 +135,8 @@ def FE13StavesData(columns):
         'description' : columns[7].text
     }
 
+    data['description'] = GeneralUnicodeCleaner(data['description'])
+
     return data
 
 # Function to set up a dictionary for weapons that will be sent back
