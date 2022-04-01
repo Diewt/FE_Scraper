@@ -47,7 +47,8 @@ info_url = {
         'inventory/staves/',
         'inventory/stones-miscellaneous/',
         'inventory/items/'
-    ]
+    ],
+    'awakeningFullGrowth' : 'characters/growth-rates/full/'
 }
 
 
@@ -255,7 +256,44 @@ def FE13Items():
 
 
 # Function to scrape full growth page: Investigate how to interact with dropdown select
+def FE13FullGrowthRates():
 
+    # Setting up page
+    page = base_url + game_url[13] + info_url['awakeningFullGrowth']
 
+    # Access page
+    try:
+        r = requests.get(page)
+    except:
+        print('Something went wrong with requesting information about the url')
+        return   
 
+    return
 
+def test():
+    page = 'https://fireemblem.fandom.com/wiki/List_of_weapons_in_Fire_Emblem_Awakening'
+
+    try:
+        r = requests.get(page)
+    except:
+        print('something went wrong')
+        return
+    
+    soup = BeautifulSoup(r.content, 'html.parser')
+    tables = soup.find_all('table')
+
+    swordtable = tables[1].find_all('tr')
+
+    updateDescription = {}
+
+    for sword in swordtable:
+        nameColumn = sword.find_all('th')
+        descriptionColumn = sword.find_all('td')
+        try:
+            nameString = nameColumn[1].text.translate({ ord(c): None for c in'\n*'})
+            descriptionString = descriptionColumn[7].text.replace('\n','')
+            updateDescription[nameString] = descriptionString
+        except:
+            pass
+
+    print(updateDescription)

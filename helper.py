@@ -106,6 +106,7 @@ def GeneralUnicodeCleaner(data):
 
 # Function to set up the data into a dictionary that will be sent back
 def FE13baseGrowthData(columns):
+
     data = {
         'name' : columns[0].text,
         'hp' : int(columns[1].text),
