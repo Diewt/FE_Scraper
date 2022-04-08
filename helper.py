@@ -99,7 +99,10 @@ def GeneralUnicodeCleaner(data):
             data = data.replace('\u00f6', 'o')
         if '\u00e1' in data:
             data = data.replace('\u00e1', 'a')
-    except:
+        if '*' in data:
+            data.translate({ ord(c): None for c in'\n*'})
+    except Exception as e:
+        print(e)
         return data
 
     return data
@@ -125,7 +128,7 @@ def FE13baseGrowthData(columns):
     # Return dictionary data back to call
     return data
 
-def FE13StavesData(columns):
+def FE13StavesData(columns, description):
     data = {
         'name' : columns[1].text,
         'rank' : columns[2].text,
@@ -133,15 +136,14 @@ def FE13StavesData(columns):
         'uses' : columns[4].text,
         'worth' : columns[5].text,
         'exp' : int(columns[6].text),
-        'description' : columns[7].text
     }
 
-    data['description'] = GeneralUnicodeCleaner(data['description'])
+    data['description'] = description[columns[1].text]
 
     return data
 
 # Function to set up a dictionary for weapons that will be sent back
-def FE13weaponData(columns):
+def FE13weaponData(columns, description):
     # Using Try Statement to account for any mismatching values ie. (encountering - for value normally has number value)
     data = {
         'name' : columns[1].text,
@@ -150,10 +152,8 @@ def FE13weaponData(columns):
         'hit' : int(columns[4].text),
         'crit' : int(columns[5].text),
         'rng' : columns[6].text,
-        'effect' : '',
         'uses' : columns[8].text,
         'worth' : columns[9].text,
-        'description' : columns[10].text
     }
 
 
@@ -162,13 +162,19 @@ def FE13weaponData(columns):
     data['worth'] = GeneralUnicodeCleaner(data['worth'])
     data['name'] = GeneralUnicodeCleaner(data['name'])
     data['effect'] = WeaponEffectParser(columns[7])
-    data['description'] = GeneralUnicodeCleaner(data['description'])
+    try:
+        data['description'] = description[data['name']]
+    except:
+        if data['name'] == 'Armourslayer':
+            data['description'] = description['Armorslayer']
+        else:
+            data['description'] = description[columns[1].text]
 
 
     return data
 
 # Function to set up a dictionary for use items that will be sent back
-def FE13useItemData(columns):
+def FE13useItemData(columns, description):
     
     # Using Try Statement to account for any mismatching values ie. (encountering - for value normally has number value)
 
@@ -176,13 +182,16 @@ def FE13useItemData(columns):
         'name' : columns[1].text,
         'uses' : columns[2].text,
         'worth' : columns[3].text,
-        'description' : columns[4].text
     }
 
     data['uses'] = GeneralUnicodeCleaner(data['uses'])
     data['worth'] = GeneralUnicodeCleaner(data['worth'])
     data['name'] = GeneralUnicodeCleaner(data['name'])
-    data['description'] = GeneralUnicodeCleaner(data['description'])
+    data['description'] = description[columns[1].text]
+
 
     return data
 
+
+# Note Figure out how to do things. Currently all data is scraped with British spelling from Serene forest.
+# We want American spelling. This is also causing a bunch of key conflicts for matching the item names.

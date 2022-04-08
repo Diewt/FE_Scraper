@@ -1,7 +1,7 @@
 import FE_SCRAPER
 
 def main():
-    FE_SCRAPER.test()
+    FE_SCRAPER.FE13ItemList()
 
 
 if __name__ == '__main__':

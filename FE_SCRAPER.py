@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 from logging import info
 import requests
 import re
@@ -208,6 +209,8 @@ def FE13Items():
 
     itemList = []
 
+    updateDescription = FE13DescriptionUpdate()
+
     # Loop to iterate through all the subpages for the awakening items
     for x in range(len(info_url['awakeningItems'])):
         
@@ -230,21 +233,21 @@ def FE13Items():
             for item in items:
                 try:
                     columns = item.find_all('td')
-                    itemList.append(helper.FE13useItemData(columns))
+                    itemList.append(helper.FE13useItemData(columns, updateDescription))
                 except IndexError:
                     pass
         elif x == 5:
             for item in items:
                 try:
                     columns = item.find_all('td')
-                    itemList.append(helper.FE13StavesData(columns))
+                    itemList.append(helper.FE13StavesData(columns, updateDescription))
                 except IndexError:
                     pass
         else:
             for item in items:
                 try:
                     columns = item.find_all('td')
-                    itemList.append(helper.FE13weaponData(columns))
+                    itemList.append(helper.FE13weaponData(columns, updateDescription))
                 except IndexError:
                     pass
 
@@ -270,7 +273,8 @@ def FE13FullGrowthRates():
 
     return
 
-def test():
+# Grabbing description update
+def FE13DescriptionUpdate():
     page = 'https://fireemblem.fandom.com/wiki/List_of_weapons_in_Fire_Emblem_Awakening'
 
     try:
@@ -282,18 +286,218 @@ def test():
     soup = BeautifulSoup(r.content, 'html.parser')
     tables = soup.find_all('table')
 
-    swordtable = tables[1].find_all('tr')
-
     updateDescription = {}
+    for x in range(8):
+        items = tables[x].find_all('tr')
 
-    for sword in swordtable:
-        nameColumn = sword.find_all('th')
-        descriptionColumn = sword.find_all('td')
-        try:
-            nameString = nameColumn[1].text.translate({ ord(c): None for c in'\n*'})
-            descriptionString = descriptionColumn[7].text.replace('\n','')
-            updateDescription[nameString] = descriptionString
-        except:
-            pass
+        # Accounting for the change in position of the description
+        if x == 5:
+            description = 5
+        elif x == 6:
+            description = 6
+        elif x == 7:
+            description = 4
+        else:
+            description = 7
 
-    print(updateDescription)
+        for item in items:
+            nameColumn = item.find_all('th')
+            descriptionColumn = item.find_all('td')
+
+            try:
+                nameString = nameColumn[1].text.translate({ ord(c): None for c in'\n*'})
+                if '-' in  descriptionColumn[description].text:
+                    descriptionString = None
+                    updateDescription[nameString] = descriptionString
+                else:
+                    descriptionString = descriptionColumn[description].text.replace('\n','')
+                    updateDescription[nameString] = descriptionString
+            except:
+                print(nameColumn[1].text)
+                print(description)
+                pass
+
+    # Setting up the items
+    page = 'https://fireemblem.fandom.com/wiki/List_of_items_in_Fire_Emblem_Awakening'
+
+    try:
+        r = requests.get(page)
+    except:
+        print('something went wrong')
+        return
+
+    soup = BeautifulSoup(r.content, 'html.parser')
+    tables = soup.find_all('table')
+
+    for x in range(2):
+        items = tables[x].find_all('tr')
+
+        for item in items:
+            nameColumn = item.find_all('th')
+            descriptionColumn = item.find_all('td')
+
+            try:
+                nameString = nameColumn[0].text.translate({ ord(c): None for c in'\n*'})
+                descriptionString = descriptionColumn[2].text.replace('\n','')
+                updateDescription[nameString] = descriptionString
+            except:
+                pass
+
+    # print(updateDescription)
+
+    return updateDescription
+
+
+def FE13ItemList():
+    weaponPage = 'https://fireemblem.fandom.com/wiki/List_of_weapons_in_Fire_Emblem_Awakening'
+    itemPage = 'https://fireemblem.fandom.com/wiki/List_of_items_in_Fire_Emblem_Awakening'
+
+    try:
+        rWeapon = requests.get(weaponPage)
+        rItem = requests.get(itemPage)
+    except:
+        print('something went wrong')
+        return
+
+    overallItemList = []
+
+    weaponSoup = BeautifulSoup(rWeapon.content, 'html.parser')
+    itemSoup = BeautifulSoup(rItem.content, 'html.parser')
+
+    weaponTable = weaponSoup.find_all('table')
+    itemTable = itemSoup.find_all('table')
+
+    for x in range(8):
+        weapons = weaponTable[x].find_all('tr')
+
+        for weapon in weapons:
+            data = {
+                'name' : None,
+                'rank' : None,
+                'range' : None,
+                'uses' : None,
+                'mt' : None,
+                'exp' : None,
+                'hit' : None,
+                'crit' : None,
+                'cost' : None,
+                'effects' : None
+            }
+
+            nameColumn = weapon.find_all('th')
+            descriptionColumn = weapon.find_all('td')
+
+            if x == 5:
+                try:
+                    data['name'] = helper.GeneralUnicodeCleaner(nameColumn[1].text.rstrip())
+                    data['rank'] = descriptionColumn[0].text.rstrip()
+                    data['range'] = descriptionColumn[1].text.rstrip()
+                    data['uses'] = int(descriptionColumn[2].text)
+                    data['exp'] = int(descriptionColumn[3].text)
+                    if '-' not in descriptionColumn[4].text:
+                        data['cost'] = int(descriptionColumn[4].text.translate({ ord(c): None for c in'\n,'}))
+                    data['description'] = descriptionColumn[5].text.rstrip()
+
+                except Exception as e:
+                    print(e)
+                    pass
+            elif x == 6:
+                try:
+                    data['name'] = helper.GeneralUnicodeCleaner(nameColumn[1].text.rstrip())
+                    data['range'] = descriptionColumn[0].text.rstrip()
+                    data['uses'] = int(descriptionColumn[1].text)
+                    data['mt'] = int(descriptionColumn[2].text)
+                    data['hit'] = int(descriptionColumn[3].text.translate({ ord(c): None for c in'%'}))
+                    data['crit'] = int(descriptionColumn[4].text.translate({ ord(c): None for c in'%'}))
+                    if '-' not in descriptionColumn[5].text:
+                        data['cost'] = int(descriptionColumn[5].text.translate({ ord(c): None for c in'\n,'}))
+                    data['description'] = descriptionColumn[5].text.rstrip()
+
+                except Exception as e:
+                    print(e)
+                    pass
+            elif x == 7:
+                try:
+                    data['name'] = helper.GeneralUnicodeCleaner(nameColumn[1].text.rstrip())
+                    data['range'] = descriptionColumn[0].text.rstrip()
+                    data['mt'] = int(descriptionColumn[1].text)
+                    data['hit'] = int(descriptionColumn[2].text.translate({ ord(c): None for c in'%'}))
+                    data['crit'] = int(descriptionColumn[3].text.translate({ ord(c): None for c in'%'}))
+                    data['description'] = descriptionColumn[4].text.rstrip()
+
+                except Exception as e:
+                    print(e)
+                    pass
+            else:
+                try:
+                    data['name'] = helper.GeneralUnicodeCleaner(nameColumn[1].text.rstrip())
+                    try:
+                        data['rank'] = descriptionColumn[0].find('span').attrs['title'].rstrip()
+                    except:
+                        data['rank'] = descriptionColumn[0].text.rstrip()
+                    data['range'] = descriptionColumn[1].text.rstrip()
+                    if '-' not in descriptionColumn[2].text:
+                        data['uses'] = int(descriptionColumn[2].text)
+                    data['mt'] = int(descriptionColumn[3].text)
+                    data['hit'] = int(descriptionColumn[4].text.translate({ ord(c): None for c in'%'}))
+                    data['crit'] = int(descriptionColumn[5].text.translate({ ord(c): None for c in'%'}))
+                    if '-' not in descriptionColumn[6].text and 'N/A' not in descriptionColumn[6].text:
+                        data['cost'] = int(descriptionColumn[6].text.translate({ ord(c): None for c in'\n,'}))
+                    if len(descriptionColumn[7].text) > 3:
+                        data['description'] = descriptionColumn[7].text.rstrip()
+
+                except Exception as e:
+                    print(e)
+                    continue
+
+            overallItemList.append(data)
+    
+    for x in range(2):
+        items = itemTable[x].find_all('tr')
+        
+        for item in items:
+            data = {
+                'name' : None,
+                'rank' : None,
+                'range' : None,
+                'uses' : None,
+                'mt' : None,
+                'exp' : None,
+                'hit' : None,
+                'crit' : None,
+                'cost' : None,
+                'effects' : None
+            }
+
+            nameColumn = item.find_all('th')
+            descriptionColumn = item.find_all('td')
+
+            if x == 1:
+                try:
+                    data['name'] = nameColumn[0].text.rstrip()
+                    if '-' not in descriptionColumn[0].text:
+                        data['uses'] = int(descriptionColumn[0].text.rstrip())
+                    data['description'] = descriptionColumn[2].text.rstrip()
+                except Exception as e:
+                    print(e)
+                    continue
+            else:
+                try:
+                    data['name'] = nameColumn[0].text.rstrip()
+                    if '-' not in descriptionColumn[0].text:
+                        data['uses'] = int(descriptionColumn[0].text.rstrip())
+                    if '-' not in descriptionColumn[1].text:
+                        data['cost'] = int(descriptionColumn[1].text.translate({ ord(c): None for c in'\n*'}))
+                    data['description'] = descriptionColumn[2].text.rstrip()
+                except Exception as e:
+                    print(e)
+                    continue
+
+            overallItemList.append(data)
+
+
+    # Write information from baseGrowth into a json file
+    with open('items.json', 'w') as f:
+        f.write(json.dumps(overallItemList, indent=4))
+        
+    return
