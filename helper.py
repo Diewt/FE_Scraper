@@ -100,7 +100,7 @@ def GeneralUnicodeCleaner(data):
         if '\u00e1' in data:
             data = data.replace('\u00e1', 'a')
         if '*' in data:
-            data.translate({ ord(c): None for c in'\n*'})
+            data.translate({ ord(c): None for c in'*'})
     except Exception as e:
         print(e)
         return data

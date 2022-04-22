@@ -430,7 +430,7 @@ def FE13ItemList():
                     pass
             else:
                 try:
-                    data['name'] = helper.GeneralUnicodeCleaner(nameColumn[1].text.rstrip())
+                    data['name'] = helper.GeneralUnicodeCleaner(nameColumn[1].text.rstrip('*\n'))
                     try:
                         data['rank'] = descriptionColumn[0].find('span').attrs['title'].rstrip()
                     except:
