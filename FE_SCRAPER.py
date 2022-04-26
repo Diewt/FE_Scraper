@@ -3,9 +3,20 @@ from logging import info
 import requests
 import re
 import json
+import time
 from bs4 import BeautifulSoup
+from selenium import webdriver
+
 
 import helper
+
+# Setting up settings for selenium webdriver
+options = webdriver.ChromeOptions()
+options.add_argument('--ignore-certificate-errors')
+options.add_argument('--incognito')
+options.add_argument('--headless')
+driver = webdriver.Chrome(executable_path='C:\Windows\Chromedriver\chromedriver.exe', chrome_options=options)
+
 
 # Base URL for the main site I will be scraping from
 base_url = 'https://serenesforest.net/'
