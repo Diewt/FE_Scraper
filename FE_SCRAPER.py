@@ -204,60 +204,6 @@ def FE13BaseGrowthRates():
 
     return
 
-# Create json file containing info about items in FE13
-def FE13Items():
-
-    itemList = []
-
-    updateDescription = FE13DescriptionUpdate()
-
-    # Loop to iterate through all the subpages for the awakening items
-    for x in range(len(info_url['awakeningItems'])):
-        
-        # Setting up the page url
-        page = base_url + game_url[13] + info_url['awakeningItems'][x] 
-
-        # Attempt to request page
-        try:
-            r = requests.get(page)
-        except:
-            print('Something went wrong with requesting information about the url')
-            return          
-
-        # Set up beautiful soup to scrape the site
-        soup = BeautifulSoup(r.content, 'html.parser')
-        items = soup.find_all('tr') 
-
-        # If statement to account for use items having different format from weapons
-        if x == 7:
-            for item in items:
-                try:
-                    columns = item.find_all('td')
-                    itemList.append(helper.FE13useItemData(columns, updateDescription))
-                except IndexError:
-                    pass
-        elif x == 5:
-            for item in items:
-                try:
-                    columns = item.find_all('td')
-                    itemList.append(helper.FE13StavesData(columns, updateDescription))
-                except IndexError:
-                    pass
-        else:
-            for item in items:
-                try:
-                    columns = item.find_all('td')
-                    itemList.append(helper.FE13weaponData(columns, updateDescription))
-                except IndexError:
-                    pass
-
-    # Write information from baseGrowth into a json file
-    with open('items.json', 'w') as f:
-        f.write(json.dumps(itemList, indent=4))
-        
-    return
-
-
 # Function to scrape full growth page: Investigate how to interact with dropdown select
 def FE13FullGrowthRates():
 
@@ -271,83 +217,40 @@ def FE13FullGrowthRates():
         print('Something went wrong with requesting information about the url')
         return   
 
+    # Setting up Beautiful Soup 
+    soup = BeautifulSoup(r.content, 'html.parser')
+    tables = soup.find_all('table')
+
+    # Table 1 = regular characters
+    # Table 2 = children characters
+    regulars = tables[1].find_all('tr')
+    childrens = tables[2].find_all('tr')
+
+    for character in regulars:
+        try:
+            columns = character.find_all('td')
+
+            classes = columns[1].find_all('option')
+
+            for x in classes:
+                columns[1].select(x.text)
+                print(columns[0].text)
+                print(columns[2].text)
+
+        except Exception as e:
+            print(e)
+            pass
+
+    for children in childrens:
+        try:
+            columns = children.find_all('tr')
+        except:
+            pass
+
     return
 
-# Grabbing description update
-def FE13DescriptionUpdate():
-    page = 'https://fireemblem.fandom.com/wiki/List_of_weapons_in_Fire_Emblem_Awakening'
 
-    try:
-        r = requests.get(page)
-    except:
-        print('something went wrong')
-        return
-    
-    soup = BeautifulSoup(r.content, 'html.parser')
-    tables = soup.find_all('table')
-
-    updateDescription = {}
-    for x in range(8):
-        items = tables[x].find_all('tr')
-
-        # Accounting for the change in position of the description
-        if x == 5:
-            description = 5
-        elif x == 6:
-            description = 6
-        elif x == 7:
-            description = 4
-        else:
-            description = 7
-
-        for item in items:
-            nameColumn = item.find_all('th')
-            descriptionColumn = item.find_all('td')
-
-            try:
-                nameString = nameColumn[1].text.translate({ ord(c): None for c in'\n*'})
-                if '-' in  descriptionColumn[description].text:
-                    descriptionString = None
-                    updateDescription[nameString] = descriptionString
-                else:
-                    descriptionString = descriptionColumn[description].text.replace('\n','')
-                    updateDescription[nameString] = descriptionString
-            except:
-                print(nameColumn[1].text)
-                print(description)
-                pass
-
-    # Setting up the items
-    page = 'https://fireemblem.fandom.com/wiki/List_of_items_in_Fire_Emblem_Awakening'
-
-    try:
-        r = requests.get(page)
-    except:
-        print('something went wrong')
-        return
-
-    soup = BeautifulSoup(r.content, 'html.parser')
-    tables = soup.find_all('table')
-
-    for x in range(2):
-        items = tables[x].find_all('tr')
-
-        for item in items:
-            nameColumn = item.find_all('th')
-            descriptionColumn = item.find_all('td')
-
-            try:
-                nameString = nameColumn[0].text.translate({ ord(c): None for c in'\n*'})
-                descriptionString = descriptionColumn[2].text.replace('\n','')
-                updateDescription[nameString] = descriptionString
-            except:
-                pass
-
-    # print(updateDescription)
-
-    return updateDescription
-
-
+# New item list function for FE13 taking from a different source site
 def FE13ItemList():
     weaponPage = 'https://fireemblem.fandom.com/wiki/List_of_weapons_in_Fire_Emblem_Awakening'
     itemPage = 'https://fireemblem.fandom.com/wiki/List_of_items_in_Fire_Emblem_Awakening'
