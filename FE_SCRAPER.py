@@ -6,16 +6,15 @@ import json
 import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 import helper
 
-# Setting up settings for selenium webdriver
-options = webdriver.ChromeOptions()
-options.add_argument('--ignore-certificate-errors')
-options.add_argument('--incognito')
-options.add_argument('--headless')
-driver = webdriver.Chrome(executable_path='C:\Windows\Chromedriver\chromedriver.exe', chrome_options=options)
+
 
 
 # Base URL for the main site I will be scraping from
@@ -237,26 +236,59 @@ def FE13FullGrowthRates():
     regulars = tables[1].find_all('tr')
     childrens = tables[2].find_all('tr')
 
+    # TODO Plan for extracting with selenium in hand for adult characters
+    # Step 1: extract the dropdown classes for selenium to interact with dropdown. Also extract list of character names
+    # Step 2: use selenium to interact with dropdown menu and send page source back for extraction
+    # Step 3: search for specific attributes with the spanID
+    # Step 4: Repeat step 2 and 3 until all classes have been recorded then continue on
+
+    # Setting up settings for selenium webdriver
+    options = webdriver.ChromeOptions()
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--incognito')
+    # options.add_argument('--headless')
+    driver = webdriver.Chrome(executable_path='C:\Windows\Chromedriver\chromedriver.exe', chrome_options=options)
+
+    characterNames = []
+    dropDownId = []
+
+    # Extracting dropdown classes and character names
     for character in regulars:
         try:
             columns = character.find_all('td')
 
-            classes = columns[1].find_all('option')
+            characterNames.append(columns[0].text)
 
-            for x in classes:
-                columns[1].select(x.text)
-                print(columns[0].text)
-                print(columns[2].text)
+            classes = columns[1].find_all('select')
+
+            dropDownId.append(classes[0].get('id'))
 
         except Exception as e:
             print(e)
             pass
 
-    for children in childrens:
-        try:
-            columns = children.find_all('tr')
-        except:
-            pass
+    print(characterNames)
+    print(dropDownId)
+
+    print(page)
+
+
+    character = 0
+    driver.get("https://serenesforest.net/awakening/characters/growth-rates/full/")
+    for x in dropDownId:
+        select = Select(driver.find_element_by_id(x))
+        options = select.options
+
+        for index in range(0, len(options)):
+            select.select_by_index(index)
+            time.sleep(0.5)
+            page_source = driver.page_source
+            soup2 = BeautifulSoup(page_source, 'html.parser')
+            print(soup2.find(id = (characterNames[character] + '0')))
+
+        character += 1
+
+    driver.quit()
 
     return
 
