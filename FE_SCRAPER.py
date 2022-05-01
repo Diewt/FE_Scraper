@@ -246,20 +246,29 @@ def FE13FullGrowthRates():
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--incognito')
-    # options.add_argument('--headless')
+    options.add_argument('--headless')
     driver = webdriver.Chrome(executable_path='C:\Windows\Chromedriver\chromedriver.exe', chrome_options=options)
 
     characterNames = []
     dropDownId = []
 
+    finalData = []
+    classoptions = {}
     # Extracting dropdown classes and character names
     for character in regulars:
         try:
             columns = character.find_all('td')
 
-            characterNames.append(columns[0].text)
+            name = (columns[0].text).strip()
+            characterNames.append(name)
+            classoptions[name] = []
 
             classes = columns[1].find_all('select')
+            options = columns[1].find_all('option')
+
+
+            for option in options:
+                classoptions[name].append(option.text)
 
             dropDownId.append(classes[0].get('id'))
 
@@ -273,22 +282,54 @@ def FE13FullGrowthRates():
     print(page)
 
 
+
+    # TODO I need to get rid of the unicode in yen'fay and say'ri name or else I can find the tag
     character = 0
     driver.get("https://serenesforest.net/awakening/characters/growth-rates/full/")
     for x in dropDownId:
         select = Select(driver.find_element_by_id(x))
         options = select.options
 
+        name = characterNames[character]
+        data = {}
+        data['name'] = helper.GeneralUnicodeCleaner(name)
+
+        classIndex = 0
         for index in range(0, len(options)):
+
             select.select_by_index(index)
-            time.sleep(0.5)
+            #time.sleep(0.5)
             page_source = driver.page_source
             soup2 = BeautifulSoup(page_source, 'html.parser')
-            print(soup2.find(id = (characterNames[character] + '0')))
+            print(soup2.find(id = (characterNames[character].replace('’','') + '0')))
+
+            try:
+                data[classoptions[name][classIndex]] = {
+                    "hp": int(soup2.find(id = (name.replace('’','') + '0')).text),
+                    "str": int(soup2.find(id = (name.replace('’','') + '1')).text),
+                    "mag": int(soup2.find(id = (name.replace('’','') + '2')).text),
+                    "skl": int(soup2.find(id = (name.replace('’','') + '3')).text),
+                    "spd": int(soup2.find(id = (name.replace('’','') + '4')).text),
+                    "lck": int(soup2.find(id = (name.replace('’','') + '5')).text),
+                    "def": int(soup2.find(id = (name.replace('’','') + '6')).text),
+                    "res": int(soup2.find(id = (name.replace('’','') + '7')).text)
+                }
+            except Exception as e:
+                print(e)
+                pass
+            classIndex += 1
+
+        finalData.append(data)
 
         character += 1
 
+    print(finalData)
+
     driver.quit()
+
+    # Write information from baseGrowth into a json file
+    with open('fullGrowth.json', 'w') as f:
+        f.write(json.dumps(finalData, indent=4))
 
     return
 
